@@ -1,176 +1,87 @@
-import { db } from "./firebase.js";
+function loadFeed(){
 
-import {
-collection,
-addDoc,
-getDocs,
-onSnapshot
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+const feed=document.getElementById("feed")
 
-window.showPage=function(page){
+if(!feed) return
 
-document.querySelectorAll(".page").forEach(p=>{
-p.style.display="none"
+feed.innerHTML=""
+
+requests.forEach(r=>{
+
+let div=document.createElement("div")
+div.className="card"
+
+if(r.urgency==="Emergency") div.classList.add("emergency")
+
+div.innerHTML=`
+<b>${r.patient}</b><br>
+Blood: ${r.blood}<br>
+Hospital: ${r.hospital}<br>
+Contact: ${r.contact}
+`
+
+feed.appendChild(div)
+
 })
 
-document.getElementById(page).style.display="block"
-
 }
 
-window.toggleDark=function(){
-document.body.classList.toggle("dark")
-}
+function searchDonor(){
 
-window.onload=function(){
-showPage("home")
-loadDonors()
-loadRequests()
-loadHospitals()
-loadBanks()
-loadLeaderboard()
-loadChat()
-}
+let blood=document.getElementById("bloodSearch").value
 
-async function addDonor(){
+let result=document.getElementById("results")
 
-const name=document.getElementById("donorName").value
-const blood=document.getElementById("donorBlood").value
-const district=document.getElementById("donorDistrict").value
+result.innerHTML=""
 
-await addDoc(collection(db,"Donors"),{
-name,blood,district,donations:0
-})
+let res=donors.filter(d=>d.blood===blood)
 
-loadDonors()
+res.forEach(d=>{
 
-}
+let div=document.createElement("div")
+div.className="card donor-card"
 
-async function loadDonors(){
-
-const snap=await getDocs(collection(db,"Donors"))
-
-let html=""
-
-snap.forEach(doc=>{
-
-const d=doc.data()
-
-html+=`<div class="card">
+div.innerHTML=`
+<div>
 <b>${d.name}</b><br>
-Blood: ${d.blood}<br>
-District: ${d.district}
-</div>`
+Blood: ${d.blood}
+</div>
+
+<div>
+<a href="tel:${d.phone}">📞</a>
+<a href="https://wa.me/${d.phone}">💬</a>
+</div>
+`
+
+result.appendChild(div)
 
 })
-
-document.getElementById("donorList").innerHTML=html
 
 }
 
-async function postRequest(){
+function loadLeaderboard(){
 
-const patient=document.getElementById("patient").value
-const blood=document.getElementById("blood").value
-const hospital=document.getElementById("hospital").value
+const list=document.getElementById("leaderboard")
 
-await addDoc(collection(db,"Requests"),{
-patient,blood,hospital
-})
-
-loadRequests()
-
-}
-
-async function loadRequests(){
-
-const snap=await getDocs(collection(db,"Requests"))
-
-let html=""
-
-snap.forEach(doc=>{
-const r=doc.data()
-
-html+=`<div class="card">
-${r.patient} needs ${r.blood} at ${r.hospital}
-</div>`
-})
-
-document.getElementById("requestList").innerHTML=html
-
-}
-
-function loadHospitals(){
-
-const hospitals=["Dhaka Medical","Square","Apollo"]
-
-let html=""
-
-hospitals.forEach(h=>{
-html+=`<div class="card">${h}</div>`
-})
-
-document.getElementById("hospitalList").innerHTML=html
-
-}
-
-function loadBanks(){
-
-const banks=["Red Crescent","Quantum","Sandhani"]
-
-let html=""
-
-banks.forEach(b=>{
-html+=`<div class="card">${b}</div>`
-})
-
-document.getElementById("bloodbankList").innerHTML=html
-
-}
-
-async function loadLeaderboard(){
-
-const snap=await getDocs(collection(db,"Donors"))
-
-let donors=[]
-
-snap.forEach(doc=>{
-donors.push(doc.data())
-})
+if(!list) return
 
 donors.sort((a,b)=>b.donations-a.donations)
 
-let html=""
+donors.forEach(d=>{
 
-donors.forEach((d,i)=>{
-html+=`<div class="card">#${i+1} ${d.name}</div>`
-})
+let li=document.createElement("li")
 
-document.getElementById("leaderList").innerHTML=html
+li.innerText=d.name+" - "+d.donations+" donations"
 
-}
-
-function loadChat(){
-
-const chatRef=collection(db,"Chat")
-
-onSnapshot(chatRef,(snap)=>{
-
-let html=""
-
-snap.forEach(doc=>{
-html+=`<div class="card">${doc.data().text}</div>`
-})
-
-document.getElementById("messages").innerHTML=html
+list.appendChild(li)
 
 })
 
 }
 
-window.sendMessage=async function(){
+window.onload=()=>{
 
-const text=document.getElementById("msg").value
-
-await addDoc(collection(db,"Chat"),{text})
+loadFeed()
+loadLeaderboard()
 
 }
