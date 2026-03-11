@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<title>Blood Request</title>
+
+<link rel="stylesheet" href="css/style.css">
+
+</head>
+
+<body>
+
+<header>
+
+<h2>Post Blood Request</h2>
+
+</header>
+
+<div class="container">
+
+<div class="card">
+
+<input placeholder="Patient Name">
+
+<select id="division" onchange="loadDistricts()">
+<option>Dhaka</option>
+<option>Sylhet</option>
+</select>
+
+<select id="district" onchange="loadUpazila()"></select>
+
+<select id="upazila" onchange="loadUnion()"></select>
+
+<select id="union" onchange="loadWard()"></select>
+
+<select id="ward"></select>
+
+<input placeholder="Hospital">
+
+<input placeholder="Contact">
+
+<button>Submit Request</button>
+
+</div>
+
+</div>
+
+<script src="js/location.js"></script>
+
+</body>
+
+</html>
